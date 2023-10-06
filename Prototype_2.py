@@ -196,6 +196,7 @@ def feed_camera():
 
     
 
+
 if __name__ == '__main__':
     main_video()
     drone_status()
