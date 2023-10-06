@@ -178,7 +178,6 @@ def drone_status():
 
 
     
-
     decrease_battery()
 
 
