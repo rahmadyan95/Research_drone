@@ -19,6 +19,11 @@ def play_video():
     ret, frame = cap.read()
     if ret:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        # Ubah ukuran frame video menjadi 1080x600 saat tombol "Center Video" ditekan
+        if video_centered:
+            frame = cv2.resize(frame, (1080, 600))
+        
         frame = Image.fromarray(frame)
         frame = ImageTk.PhotoImage(frame)
         label.config(image=frame)
@@ -33,13 +38,13 @@ def toggle_center_video():
         label.place(x=(root.winfo_width() - label.winfo_width()) / 2, y=(root.winfo_height() - label.winfo_height()) / 2)
         video_centered = False
     else:
-        # Jika video belum diatur ulang, atur ulang ke posisi semula
+        # Jika video belum diatur ulang, atur ulang ke posisi semula dan ubah ukuran
         label.place(x=0, y=0)
         video_centered = True
 
 # Tombol untuk memindahkan video ke tengah atau posisi semula
 center_button = ttk.Button(root, text="Center Video", command=toggle_center_video)
-center_button.pack()
+center_button.place(x = 1200, y= 100)
 
 # Label untuk menampilkan frame video
 label = ttk.Label(root)

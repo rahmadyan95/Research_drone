@@ -185,6 +185,9 @@ def drone_status():
 # kotak Feed Camera
 
 def feed_camera():
+
+    video_centered = False
+
     frame_bawah = tk.Frame(root, width=screen_width // 1.015, height=screen_height // 3.4, bg="white",
                            highlightbackground="black", highlightthickness=3)
     frame_bawah.pack_propagate(False)
@@ -196,6 +199,13 @@ def feed_camera():
 
     
 
+# Fungsi untuk memindahkan video ke tengah atau posisi semula
+
+    
+    
+
+
+    
 
 if __name__ == '__main__':
     main_video()
