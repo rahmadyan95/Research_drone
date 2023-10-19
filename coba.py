@@ -124,6 +124,10 @@ class main_frame:
                                 font=("Consolas", 18), bg=background_color)
         label_di_frame.pack(pady=10)
 
+
+
+
+
 if __name__ == '__main__':
     root = tk.Tk()
     root.title("Video Viewer")
