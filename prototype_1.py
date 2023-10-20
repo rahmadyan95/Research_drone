@@ -1,102 +1,81 @@
-import tkinter as tk
 import cv2
+import tkinter as tk
 from PIL import Image, ImageTk
 
-root = tk.Tk()
-root.title("Video Viewer")
-root.state('zoomed') 
-root.resizable(False, False)
+class Camera:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Video Streams")
 
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
+        self.canvas1 = tk.Canvas(self.root, width=640, height=480)
+        self.canvas1.pack(side='left')
 
-# Video Source 
-cap1 = cv2.VideoCapture(0)
-cap2 = cv2.VideoCapture(0)
-cap3 = cv2.VideoCapture(0)  
-cap4 = cv2.VideoCapture(0)  
+        self.canvas2 = tk.Canvas(self.root, width=640, height=480)
+        self.canvas2.pack(side='right')
 
-half_width = screen_width // 2
-half_height = screen_height // 2 
+        self.canvas3 = tk.Canvas(self.root, width=640, height=480)
+        self.canvas3.pack(side='bottom')
 
-frame1 = tk.Frame(root, width=half_width, height=half_height)
-frame1.grid(row=0, column=0, padx=5, pady=5)  
+        self.cap1 = cv2.VideoCapture(0)
+        self.cap2 = cv2.VideoCapture("test1.mp4")
+        self.cap3 = cv2.VideoCapture("test2.mp4")
 
-frame2 = tk.Frame(root, width=half_width, height=half_height)
-frame2.grid(row=0, column=1, padx=5, pady=5)  
+        self.current_canvas = 1  # Inisialisasi untuk menunjukkan video 1 di canvas 1
 
-frame3 = tk.Frame(root, width=half_width, height=half_height)
-frame3.grid(row=1, column=0, padx=5, pady=5)  
+        # Tombol untuk mengganti tampilan video
+        self.switch_button = tk.Button(self.root, text="Switch Videos", command=self.switch_videos)
+        self.switch_button.pack()
 
-frame4 = tk.Frame(root, width=half_width, height=half_height)
-frame4.grid(row=1, column=1, padx=5, pady=5)  
+        self.update()
 
-def resize_frame(frame, width, height):
-    return cv2.resize(frame, (width, height))
+    def switch_videos(self):
+        if self.current_canvas == 1:
+            self.current_canvas = 2
+        elif self.current_canvas == 2:
+            self.current_canvas = 3
+        else:
+            self.current_canvas = 1
 
-def show_frame1():
-    ret, frame = cap1.read()
-    if ret:
+        # Hapus semua gambar di semua canvas
+        self.canvas1.delete("all")
+        self.canvas2.delete("all")
+        self.canvas3.delete("all")
+
+    def resize_frame(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = resize_frame(frame, half_width, half_height)
-        cv2.putText(frame, "Camera 1", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 , 128, 0), 2)
-        img = Image.fromarray(frame)
-        imgtk = ImageTk.PhotoImage(image=img)
-        label1.imgtk = imgtk
-        label1.configure(image=imgtk)
-        label1.after(10, show_frame1)  
+        frame = cv2.resize(frame, (1000, 680))
+        return frame
 
-def show_frame2():
-    ret, frame = cap2.read()
-    if ret:
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = resize_frame(frame, half_width, half_height)
-        cv2.putText(frame, "Camera 2", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 , 128, 0), 2)
-        img = Image.fromarray(frame)
-        imgtk = ImageTk.PhotoImage(image=img)
-        label2.imgtk = imgtk
-        label2.configure(image=imgtk)
-        label2.after(10, show_frame2) 
+    def update(self):
+        ret1, frame1 = self.cap1.read()
+        ret2, frame2 = self.cap2.read()
+        ret3, frame3 = self.cap3.read()
 
-def show_frame3():
-    ret, frame = cap3.read()
-    if ret:
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = resize_frame(frame, half_width, half_height)
-        cv2.putText(frame, "Camera 3", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 , 128, 0), 2)
-        img = Image.fromarray(frame)
-        imgtk = ImageTk.PhotoImage(image=img)
-        label3.imgtk = imgtk
-        label3.configure(image=imgtk)
-        label3.after(10, show_frame3)  
+        if ret1 and ret2 and ret3:
+            frame1_resized = self.resize_frame(frame1)
+            frame2_resized = self.resize_frame(frame2)
+            frame3_resized = self.resize_frame(frame3)
 
-def show_frame4():
-    ret, frame = cap4.read()
-    if ret:
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = resize_frame(frame, half_width, half_height)
-        cv2.putText(frame, "Camera 4", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0 , 128, 0), 2)
-        img = Image.fromarray(frame)
-        imgtk = ImageTk.PhotoImage(image=img)
-        label4.imgtk = imgtk
-        label4.configure(image=imgtk)
-        label4.after(10, show_frame4) 
+            self.photo1 = ImageTk.PhotoImage(image=Image.fromarray(frame1_resized))
+            self.photo2 = ImageTk.PhotoImage(image=Image.fromarray(frame2_resized))
+            self.photo3 = ImageTk.PhotoImage(image=Image.fromarray(frame3_resized))
 
-label1 = tk.Label(frame1)
-label1.pack()
+            if self.current_canvas == 1:
+                self.canvas1.create_image(0, 0, image=self.photo1, anchor='nw')
+                self.canvas2.create_image(0, 0, image=self.photo2, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
+            elif self.current_canvas == 2:
+                self.canvas1.create_image(0, 0, image=self.photo2, anchor='nw')
+                self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
+            elif self.current_canvas == 3:
+                self.canvas1.create_image(0, 0, image=self.photo3, anchor='nw')
+                self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
 
-label2 = tk.Label(frame2)
-label2.pack()
+        self.root.after(10, self.update)
 
-label3 = tk.Label(frame3)
-label3.pack()
-
-label4 = tk.Label(frame4)
-label4.pack()
-
-show_frame1()
-show_frame2()
-show_frame3()
-show_frame4()
-
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Camera(root)
+    root.mainloop()

@@ -17,17 +17,13 @@ class VideoPlayerApp:
         self.canvas_a = tk.Canvas(self.root, width=640, height=480)
         self.canvas_b = tk.Canvas(self.root, width=640, height=480)
         self.canvas_a.grid(row=0, column=0, padx=10, pady=10)
-        self.canvas_b.grid(row=0, column=1, padx=10, pady=10)
+        self.canvas_b.grid(row=1, column=0, padx=10, pady=10)
 
         self.play_button = ttk.Button(self.root, text="Play", command=self.play_video)
         self.play_button.grid(row=1, column=0, padx=10, pady=10)
         self.switch_button = ttk.Button(self.root, text="Pindah", command=self.switch_canvas)
         self.switch_button.grid(row=1, column=1, padx=10, pady=10)
-
-        self.root = root
-        self.screen_width = self.root.winfo_screenwidth()
-        self.screen_height = self.root.winfo_screenheight()
-        self.create_main_video_frame()
+        
 
         self.playing = False
         self.update()
