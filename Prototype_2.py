@@ -6,7 +6,7 @@ from tkinter.ttk import *
 from tkinter import*
 import cv2
 from PIL import Image, ImageTk
-
+from video_utility import GetVideo, VideoData
 
 
 class main_frame:
@@ -14,6 +14,22 @@ class main_frame:
         self.root = root
         self.frame_atas = frame_atas
         self.frame_bawah = frame_bawah
+
+        self.__data1 = VideoData()
+        self.__data2 = VideoData()
+        # self.__data3 = VideoData()
+        # self.data4 = VideoData()
+        # self.data5 = VideoData()
+
+        self.__fetcher1 = GetVideo(self.__data1, 0)
+        self.__fetcher2 = GetVideo(self.__data2, 1)
+        # self.__fetcher3 = GetVideo(self.__data3, 0)
+
+        self.__fetcher1.start_fetch()
+        self.__fetcher2.start_fetch()
+        # self.__fetcher3.start_fetch()
+
+
 
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -38,12 +54,12 @@ class main_frame:
         self.switch_button.place(x=1150 ,y = 50)
 
     
-        self.cap1 = cv2.VideoCapture(0)
-        self.cap1.set(cv2.CAP_PROP_BUFFERSIZE,1)
-        self.cap2 = cv2.VideoCapture('test1.mp4')
-        self.cap2.set(cv2.CAP_PROP_BUFFERSIZE,1)
-        self.cap3 = cv2.VideoCapture('test2.mp4')
-        self.cap3.set(cv2.CAP_PROP_BUFFERSIZE,1)
+        # self.cap1 = cv2.VideoCapture(0)
+        # self.cap1.set(cv2.CAP_PROP_BUFFERSIZE,1)
+        # self.cap2 = cv2.VideoCapture('test1.mp4')
+        # self.cap2.set(cv2.CAP_PROP_BUFFERSIZE,1)
+        # self.cap3 = cv2.VideoCapture('test2.mp4')
+        # self.cap3.set(cv2.CAP_PROP_BUFFERSIZE,1)
 
         self.current_canvas = 1
        
@@ -85,32 +101,68 @@ class main_frame:
         frame = cv2.resize(frame, (1200, 480))
         return frame
     
+    def minimize_frame(self, frame):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.resize(frame, (340,190))
+        return frame
+    
+    
     def update(self):
-        ret1, frame1 = self.cap1.read()
-        ret2, frame2 = self.cap2.read()
-        ret3, frame3 = self.cap3.read()
+        # kembalikan seperti semua yang diatas
 
-        if ret1 and ret2 and ret3:
-            frame1_resized = self.resize_frame(frame1)
-            frame2_resized = self.resize_frame(frame2)
-            frame3_resized = self.resize_frame(frame3)
 
+        ret1, frame1 = self.__data1.getImage()
+        ret2, frame2 = self.__data2.getImage() 
+        # ret3, frame3 = self.__data3.getImage() 
+        # ret3, frame3 = self.cap3.read()
+
+        # YANG DIBAWAH KEMBALIKAN SEPERTI
+        
+        frame1_resized = None
+        frame2_resized = None
+
+        if ret1 and ret2 :
+            # frame1_resized = self.resize_frame(frame1)
+            # frame2_resized = self.resize_frame(frame2)
+            # frame3_resized = self.resize_frame(frame3)
+
+            if self.current_canvas == 1:
+                frame1_resized = self.resize_frame(frame1)
+                frame2_resized = self.minimize_frame(frame2)
+            elif self.current_canvas == 2:
+                frame1_resized = self.minimize_frame(frame1)
+                frame2_resized = self.resize_frame(frame2)
+        
+        if frame1_resized is not None and frame2_resized is not None:  # Periksa apakah frame diinisialisasi
             self.photo1 = ImageTk.PhotoImage(image=Image.fromarray(frame1_resized))
             self.photo2 = ImageTk.PhotoImage(image=Image.fromarray(frame2_resized))
-            self.photo3 = ImageTk.PhotoImage(image=Image.fromarray(frame3_resized))
 
             if self.current_canvas == 1:
                 self.canvas1.create_image(0, 0, image=self.photo1, anchor='nw')
                 self.canvas2.create_image(0, 0, image=self.photo2, anchor='nw')
-                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
             elif self.current_canvas == 2:
                 self.canvas1.create_image(0, 0, image=self.photo2, anchor='nw')
                 self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
-                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
-            elif self.current_canvas == 3:
-                self.canvas1.create_image(0, 0, image=self.photo3, anchor='nw')
-                self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
-                self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
+
+            # self.photo1 = ImageTk.PhotoImage(image=Image.fromarray(frame1_resized))
+            # self.photo2 = ImageTk.PhotoImage(image=Image.fromarray(frame2_resized))
+            # # self.photo3 = ImageTk.PhotoImage(image=Image.fromarray(frame3_resized))
+
+            # if self.current_canvas == 1:
+            #     self.canvas1.create_image(0, 0, image=self.photo1, anchor='nw')
+            #     self.canvas2.create_image(0, 0, image=self.photo2, anchor='nw')
+            #     # self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
+            # elif self.current_canvas == 2:
+            #     self.canvas1.create_image(0, 0, image=self.photo2, anchor='nw')
+            #     self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
+                
+                # self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
+            # elif self.current_canvas == 3:
+            #     self.canvas1.create_image(0, 0, image=self.photo3, anchor='nw')
+            #     self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
+            #     self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
+
+        
 
         self.root.after(10, self.update)
 
@@ -251,3 +303,6 @@ if __name__ == '__main__':
 
 
     root.mainloop()
+    
+
+    
