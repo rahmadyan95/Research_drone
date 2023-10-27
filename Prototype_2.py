@@ -10,25 +10,27 @@ from video_utility import GetVideo, VideoData
 
 
 class main_frame:
-    def __init__(self,root,frame_atas,frame_bawah) :
+    def __init__(self,root,frame_atas,frame_bawah,frame_kotak) :
         self.root = root
         self.frame_atas = frame_atas
         self.frame_bawah = frame_bawah
+        self.frame_kotak = frame_kotak
 
         self.__data1 = VideoData()
         self.__data2 = VideoData()
-        # self.__data3 = VideoData()
-        # self.data4 = VideoData()
+        self.__data3 = VideoData()
+        self.__data4 = VideoData()
         # self.data5 = VideoData()
 
         self.__fetcher1 = GetVideo(self.__data1, 0)
         self.__fetcher2 = GetVideo(self.__data2, 1)
-        # self.__fetcher3 = GetVideo(self.__data3, 0)
+        self.__fetcher3 = GetVideo(self.__data3, 2)
+        self.__fetcher4 = GetVideo(self.__data4, 0)
 
         self.__fetcher1.start_fetch()
         self.__fetcher2.start_fetch()
-        # self.__fetcher3.start_fetch()
-
+        self.__fetcher3.start_fetch()
+        self.__fetcher4.start_fetch()
 
 
         self.screen_width = self.root.winfo_screenwidth()
@@ -43,15 +45,19 @@ class main_frame:
         self.canvas2.pack_propagate(False)
 
         self.canvas3 = tk.Canvas(self.frame_bawah, width=340, height= 190)
-        self.canvas3.place(x=400, y=50)
+        self.canvas3.place(x=380, y=50)
         self.canvas3.pack_propagate(False)
 
         self.canvas4 = tk.Canvas(self.frame_bawah, width=340, height= 190)
         self.canvas4.place(x=775, y=50)
         self.canvas4.pack_propagate(False)
+
+        self.canvas5 = tk.Canvas(self.frame_bawah, width=340, height= 190)
+        self.canvas5.place(x=1150, y=50)
+        self.canvas5.pack_propagate(False)
         
-        self.switch_button = tk.Button(self.frame_bawah, text="Switch Videos", command=self.switch_videos)
-        self.switch_button.place(x=1150 ,y = 50)
+        self.switch_button = tk.Button(self.frame_kotak, text="Switch Videos", command=self.switch_videos)
+        self.switch_button.place(x=50 ,y = 500)
 
     
         # self.cap1 = cv2.VideoCapture(0)
@@ -89,12 +95,18 @@ class main_frame:
             self.current_canvas = 2
         elif self.current_canvas == 2:
             self.current_canvas = 3
+        elif self.current_canvas == 3:
+            self.current_canvas = 4
+        elif self.current_canvas == 4 :
+            self.current_canvas = 1
+
         else:
-            self.current_canvas = 1 
+            self.current_canvas = 1
 
         self.canvas1.delete("all")
         self.canvas2.delete("all")
         self.canvas3.delete("all")
+        self.canvas4.delete("all")
 
     def resize_frame(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -113,15 +125,17 @@ class main_frame:
 
         ret1, frame1 = self.__data1.getImage()
         ret2, frame2 = self.__data2.getImage() 
-        # ret3, frame3 = self.__data3.getImage() 
-        # ret3, frame3 = self.cap3.read()
+        ret3, frame3 = self.__data3.getImage() 
+        ret4, frame4 = self.__data4.getImage()
 
         # YANG DIBAWAH KEMBALIKAN SEPERTI
         
         frame1_resized = None
         frame2_resized = None
+        frame3_resized = None
+        frame4_resized = None
 
-        if ret1 and ret2 :
+        if ret1 and ret2 and ret3 and ret4 :
             # frame1_resized = self.resize_frame(frame1)
             # frame2_resized = self.resize_frame(frame2)
             # frame3_resized = self.resize_frame(frame3)
@@ -129,38 +143,48 @@ class main_frame:
             if self.current_canvas == 1:
                 frame1_resized = self.resize_frame(frame1)
                 frame2_resized = self.minimize_frame(frame2)
+                frame3_resized = self.minimize_frame(frame3)
+                frame4_resized = self.minimize_frame(frame4)
             elif self.current_canvas == 2:
                 frame1_resized = self.minimize_frame(frame1)
                 frame2_resized = self.resize_frame(frame2)
-        
-        if frame1_resized is not None and frame2_resized is not None:  # Periksa apakah frame diinisialisasi
+                frame3_resized = self.minimize_frame(frame3)
+                frame4_resized = self.minimize_frame(frame4)
+            elif self.current_canvas == 3 :
+                frame1_resized = self.minimize_frame(frame1)
+                frame2_resized = self.minimize_frame(frame2)
+                frame3_resized = self.resize_frame(frame3)
+                frame4_resized = self.minimize_frame(frame4)
+
+            elif self.current_canvas == 4 :
+                frame1_resized = self.minimize_frame(frame1)
+                frame2_resized = self.minimize_frame(frame2)
+                frame3_resized = self.minimize_frame(frame3)
+                frame4_resized = self.resize_frame(frame4)
+
+        if frame1_resized is not None and frame2_resized is not None and frame3_resized is not None:
             self.photo1 = ImageTk.PhotoImage(image=Image.fromarray(frame1_resized))
             self.photo2 = ImageTk.PhotoImage(image=Image.fromarray(frame2_resized))
+            self.photo3 = ImageTk.PhotoImage(image=Image.fromarray(frame3_resized))
+            self.photo4 = ImageTk.PhotoImage(image=Image.fromarray(frame4_resized))
 
             if self.current_canvas == 1:
                 self.canvas1.create_image(0, 0, image=self.photo1, anchor='nw')
                 self.canvas2.create_image(0, 0, image=self.photo2, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
             elif self.current_canvas == 2:
                 self.canvas1.create_image(0, 0, image=self.photo2, anchor='nw')
                 self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
-
-            # self.photo1 = ImageTk.PhotoImage(image=Image.fromarray(frame1_resized))
-            # self.photo2 = ImageTk.PhotoImage(image=Image.fromarray(frame2_resized))
-            # # self.photo3 = ImageTk.PhotoImage(image=Image.fromarray(frame3_resized))
-
-            # if self.current_canvas == 1:
-            #     self.canvas1.create_image(0, 0, image=self.photo1, anchor='nw')
-            #     self.canvas2.create_image(0, 0, image=self.photo2, anchor='nw')
-            #     # self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
-            # elif self.current_canvas == 2:
-            #     self.canvas1.create_image(0, 0, image=self.photo2, anchor='nw')
-            #     self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
-                
-                # self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
-            # elif self.current_canvas == 3:
-            #     self.canvas1.create_image(0, 0, image=self.photo3, anchor='nw')
-            #     self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
-            #     self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo3, anchor='nw')
+            elif self.current_canvas == 3:
+                self.canvas1.create_image(0, 0, image=self.photo3, anchor='nw')
+                self.canvas2.create_image(0, 0, image=self.photo1, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
+            else:
+                self.canvas1.create_image(0, 0, image=self.photo4, anchor='nw')
+                self.canvas2.create_image(0, 0, image=self.photo3, anchor='nw')
+                self.canvas3.create_image(0, 0, image=self.photo2, anchor='nw')
+                self.canvas4.create_image(0, 0, image=self.photo1, anchor='nw')
 
         
 
@@ -186,32 +210,32 @@ class main_frame:
     #     self.label_di_frame.pack(pady=10)
 
     def drone_status(self):
-        frame_kotak = tk.Frame(self.root, width=self.screen_width // 4.8, height=self.screen_height // 1.57, bg="white",
-                              highlightbackground="black", highlightthickness=3)
-        frame_kotak.pack_propagate(False)
-        frame_kotak.place(x=1125, y=10)
+        # self.frame_kotak = tk.Frame(self.root, width=self.screen_width // 4.8, height=self.screen_height // 1.57, bg="white",
+        #                       highlightbackground="black", highlightthickness=3)
+        # self.frame_kotak.pack_propagate(False)
+        # self.frame_kotak.place(x=1125, y=10)
 
-        background_color = frame_kotak.cget("bg")
-        label_judul_frame = tk.Label(frame_kotak, text="Drone Status", font=("Consolas", 18), bg=background_color)
+        background_color = self.frame_kotak.cget("bg")
+        label_judul_frame = tk.Label(self.frame_kotak, text="Drone Status", font=("Consolas", 18), bg=background_color)
         label_judul_frame.pack(pady=10)
 
-        label_batere_frame = tk.Label(frame_kotak, text='Battery', font=("Consolas", 12), bg=background_color)
+        label_batere_frame = tk.Label(self.frame_kotak, text='Battery', font=("Consolas", 12), bg=background_color)
         label_batere_frame.place(x=5, y=60)
         label_batere_frame.pack_propagate(False)
 
-        self.battery_label = tk.Label(frame_kotak, text=f"{self.battery_level}%", font=("Consolas", 12), bg=background_color)
+        self.battery_label = tk.Label(self.frame_kotak, text=f"{self.battery_level}%", font=("Consolas", 12), bg=background_color)
         self.battery_label.place(x=180, y=60)
         label_batere_frame.pack_propagate(False)
 
-        self.battery_progress = Progressbar(frame_kotak, length=100, maximum=100, value=self.battery_level)
+        self.battery_progress = Progressbar(self.frame_kotak, length=100, maximum=100, value=self.battery_level)
         self.battery_progress.place(x=75, y=61)
         label_batere_frame.pack_propagate(False)
 
-        speed_label = tk.Label(frame_kotak, text=f"Speed = {self.drone_speed} Km/h ", font=("Consolas", 11), bg="green", fg="white")
+        speed_label = tk.Label(self.frame_kotak, text=f"Speed = {self.drone_speed} Km/h ", font=("Consolas", 11), bg="green", fg="white")
         speed_label.place(x=5, y=90)
         label_batere_frame.pack_propagate(False)
 
-        rpm_frame = tk.Frame(frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
+        rpm_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
         rpm_frame.pack_propagate(False)
         rpm_frame.place(x=5, y=120)
 
@@ -224,7 +248,7 @@ class main_frame:
         rpm_label = tk.Label(rpm_frame, text=f"Eng_3 = {self.rpm_3}\n\nEng_4 = {self.rpm_4}", font=("Consolas", 11), bg=background_color)
         rpm_label.place(x=160, y=30)
 
-        temprature_frame = tk.Frame(frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
+        temprature_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
         temprature_frame.pack_propagate(False)
         temprature_frame.place(x=5, y=225)
 
@@ -237,7 +261,7 @@ class main_frame:
         rpm_label = tk.Label(temprature_frame, text=f"Eng_3 = {self.temp_3} ºC\n\nEng_4 = {self.temp_4} ºC", font=("Consolas", 11), bg=background_color)
         rpm_label.place(x=160, y=30)
 
-        coordinates = tk.Frame(frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
+        coordinates = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
         coordinates.place(x=5, y=330)
         coordinates.pack_propagate(False)
 
@@ -295,11 +319,16 @@ if __name__ == '__main__':
                             font=("Consolas", 18), bg=background_color)
     label_di_frame.pack(pady=5)
 
+    frame_kotak = tk.Frame(root, width=screen_width // 4.8, height=screen_height // 1.57, bg="white",
+                              highlightbackground="black", highlightthickness=3)
+    frame_kotak.pack_propagate(False)
+    frame_kotak.place(x=1125, y=10)
+
     
 
 
 
-    app = main_frame(root,frame_atas,frame_bawah)
+    app = main_frame(root,frame_atas,frame_bawah,frame_kotak)
 
 
     root.mainloop()
