@@ -8,6 +8,8 @@ import cv2
 from PIL import Image, ImageTk
 from video_utility import GetVideo, VideoData
 import keyboard 
+import numpy as np
+import io
 
 class main_frame:
     def __init__(self,root,frame_atas,frame_bawah,frame_kotak) :
@@ -28,11 +30,11 @@ class main_frame:
         # self.__fetcher4 = GetVideo(self.__data4, "rtsp://192.168.50.116:8554/cam3")
         # self.__fetcher5 = GetVideo(self.__data5, "rtsp://192.168.50.116:8554/cam4")
         
-        self.__fetcher1 = GetVideo(self.__data1, 0)
+        self.__fetcher1 = GetVideo(self.__data1, 4)
         self.__fetcher2 = GetVideo(self.__data2, 1)
         self.__fetcher3 = GetVideo(self.__data3, 2)
         self.__fetcher4 = GetVideo(self.__data4, 3)
-        self.__fetcher5 = GetVideo(self.__data5, 4)
+        self.__fetcher5 = GetVideo(self.__data5, 0)
 
         self.__fetcher1.start_fetch()
         self.__fetcher2.start_fetch()
@@ -68,6 +70,7 @@ class main_frame:
         # self.switch_button.place(x=50 ,y = 500)
 
         self.root.bind('<space>', self.switch_videos)
+        self.root.bind('<Return>', self.save_canvas_image)
 
         # keyboard.add_hotkey('space',lambda: )
 
@@ -119,6 +122,20 @@ class main_frame:
         self.canvas3.delete("all")
         self.canvas4.delete("all")
         self.canvas5.delete("all")
+
+    def save_canvas_image(self,event=None):
+        if self.current_canvas == 1:
+            canvas_image = self.canvas1.postscript(colormode='color')
+            image = Image.open(io.BytesIO(canvas_image.encode('utf-8')))
+            image = np.array(image)
+
+            image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+
+            filename = "canvas1_image.png"
+            cv2.imwrite(filename, image)
+            print(f"Gambar dari canvas1 tersimpan di {filename}")
+
+        
 
     def resize_frame(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -314,7 +331,15 @@ class main_frame:
     #                             font=("Consolas", 18), bg=self.background_color)
     #     self.label_di_frame.pack(pady=10)
         
-    
+    def on_closing(self):
+        self.__fetcher1.stop_fetch()
+        self.__fetcher2.stop_fetch()
+        self.__fetcher3.stop_fetch()
+        self.__fetcher4.stop_fetch()
+        self.__fetcher5.stop_fetch()
+
+        self.root.destroy()
+
 if __name__ == '__main__':
 
     
@@ -361,7 +386,7 @@ if __name__ == '__main__':
 
     app = main_frame(root,frame_atas,frame_bawah,frame_kotak)
     
-
+    root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
     
 
