@@ -10,6 +10,7 @@ from video_utility import GetVideo, VideoData
 import keyboard 
 import numpy as np
 import io
+import datetime
 
 class main_frame:
     def __init__(self,root,frame_atas,frame_bawah,frame_kotak) :
@@ -30,11 +31,11 @@ class main_frame:
         # self.__fetcher4 = GetVideo(self.__data4, "rtsp://192.168.50.116:8554/cam3")
         # self.__fetcher5 = GetVideo(self.__data5, "rtsp://192.168.50.116:8554/cam4")
         
-        self.__fetcher1 = GetVideo(self.__data1, 4)
+        self.__fetcher1 = GetVideo(self.__data1, 0)
         self.__fetcher2 = GetVideo(self.__data2, 1)
         self.__fetcher3 = GetVideo(self.__data3, 2)
         self.__fetcher4 = GetVideo(self.__data4, 3)
-        self.__fetcher5 = GetVideo(self.__data5, 0)
+        self.__fetcher5 = GetVideo(self.__data5, 4)
 
         self.__fetcher1.start_fetch()
         self.__fetcher2.start_fetch()
@@ -66,8 +67,8 @@ class main_frame:
         self.canvas5.place(x=1050, y=50)
         self.canvas5.pack_propagate(False)
         
-        # self.switch_button = tk.Button(self.frame_kotak, text="Switch Videos", command=self.switch_videos)
-        # self.switch_button.place(x=50 ,y = 500)
+        self.switch_button = tk.Button(self.frame_kotak, text="Switch Videos", command=self.switch_videos)
+        self.switch_button.place(x=50 ,y = 500)
 
         self.root.bind('<space>', self.switch_videos)
         self.root.bind('<Return>', self.save_canvas_image)
@@ -87,14 +88,14 @@ class main_frame:
 
         self.battery_level = 100
         self.drone_speed = 20
-        self.rpm_1 = 6000
-        self.rpm_2 = 6000
-        self.rpm_3 = 6000
-        self.rpm_4 = 6000
-        self.temp_1 = 40
-        self.temp_2 = 40
-        self.temp_3 = 40
-        self.temp_4 = 40
+        # self.rpm_1 = 6000
+        # self.rpm_2 = 6000
+        # self.rpm_3 = 6000
+        # self.rpm_4 = 6000
+        # self.temp_1 = 40
+        # self.temp_2 = 40
+        # self.temp_3 = 40
+        # self.temp_4 = 40
         self.x = 10.13
         self.y = 23.435
         self.z = 43.535
@@ -103,6 +104,7 @@ class main_frame:
         self.update()
         # self.main_video_frame()
         # self.feed_camera_frame()
+
 
 
     def switch_videos(self,event=None):
@@ -124,22 +126,24 @@ class main_frame:
         self.canvas5.delete("all")
 
     def save_canvas_image(self,event=None):
-        if self.current_canvas == 1:
-            canvas_image = self.canvas1.postscript(colormode='color')
-            image = Image.open(io.BytesIO(canvas_image.encode('utf-8')))
-            image = np.array(image)
+        # if self.current_canvas == 1:
+        x = datetime.datetime.now()
+        canvas_image = self.canvas1.postscript(colormode='color')
+        image = Image.open(io.BytesIO(canvas_image.encode('utf-8')))
+        image = np.array(image)
 
-            image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
 
-            filename = "canvas1_image.png"
-            cv2.imwrite(filename, image)
-            print(f"Gambar dari canvas1 tersimpan di {filename}")
+        filename = f"Capture at {x.hour}:{x.minute}:{x.second}.png"
+        cv2.imwrite(filename, image)
+        print(f"Gambar dari canvas1 tersimpan di {filename}")
+        
 
         
 
     def resize_frame(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = cv2.resize(frame, (1050, 480))
+        frame = cv2.resize(frame, (1054, 484))
         return frame
     
     def minimize_frame(self, frame):
@@ -283,41 +287,44 @@ class main_frame:
         speed_label.place(x=5, y=90)
         label_batere_frame.pack_propagate(False)
 
-        rpm_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
-        rpm_frame.pack_propagate(False)
-        rpm_frame.place(x=5, y=120)
+        # rpm_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
+        # rpm_frame.pack_propagate(False)
+        # rpm_frame.place(x=5, y=120)
 
-        rpm_label = tk.Label(rpm_frame, text="Revolution Per Minute", font=("Consolas", 10), bg="yellow", fg="black")
-        rpm_label.pack(pady=1)
+        # rpm_label = tk.Label(rpm_frame, text="Revolution Per Minute", font=("Consolas", 10), bg="yellow", fg="black")
+        # rpm_label.pack(pady=1)
 
-        rpm_label = tk.Label(rpm_frame, text=f"Eng_1 = {self.rpm_1}\n\nEng_2 = {self.rpm_2}", font=("Consolas", 11), bg=background_color)
-        rpm_label.place(x=5, y=30)
+        # rpm_label = tk.Label(rpm_frame, text=f"Eng_1 = {self.rpm_1}\n\nEng_2 = {self.rpm_2}", font=("Consolas", 11), bg=background_color)
+        # rpm_label.place(x=5, y=30)
 
-        rpm_label = tk.Label(rpm_frame, text=f"Eng_3 = {self.rpm_3}\n\nEng_4 = {self.rpm_4}", font=("Consolas", 11), bg=background_color)
-        rpm_label.place(x=160, y=30)
+        # rpm_label = tk.Label(rpm_frame, text=f"Eng_3 = {self.rpm_3}\n\nEng_4 = {self.rpm_4}", font=("Consolas", 11), bg=background_color)
+        # rpm_label.place(x=160, y=30)
 
-        temprature_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
-        temprature_frame.pack_propagate(False)
-        temprature_frame.place(x=5, y=225)
+        # temprature_frame = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
+        # temprature_frame.pack_propagate(False)
+        # temprature_frame.place(x=5, y=225)
 
-        rpm_label = tk.Label(temprature_frame, text="Temperature", font=("Consolas", 10), bg="yellow", fg="black")
-        rpm_label.pack(pady=1)
+        # rpm_label = tk.Label(temprature_frame, text="Temperature", font=("Consolas", 10), bg="yellow", fg="black")
+        # rpm_label.pack(pady=1)
 
-        rpm_label = tk.Label(temprature_frame, text=f"Eng_1 = {self.temp_1} ºC\n\nEng_2 = {self.temp_2} ºC", font=("Consolas", 11), bg=background_color)
-        rpm_label.place(x=5, y=30)
+        # rpm_label = tk.Label(temprature_frame, text=f"Eng_1 = {self.temp_1} ºC\n\nEng_2 = {self.temp_2} ºC", font=("Consolas", 11), bg=background_color)
+        # rpm_label.place(x=5, y=30)
 
-        rpm_label = tk.Label(temprature_frame, text=f"Eng_3 = {self.temp_3} ºC\n\nEng_4 = {self.temp_4} ºC", font=("Consolas", 11), bg=background_color)
-        rpm_label.place(x=160, y=30)
+        # rpm_label = tk.Label(temprature_frame, text=f"Eng_3 = {self.temp_3} ºC\n\nEng_4 = {self.temp_4} ºC", font=("Consolas", 11), bg=background_color)
+        # rpm_label.place(x=160, y=30)
 
         coordinates = tk.Frame(self.frame_kotak, width=285, height=100, bg="white", highlightbackground="black", highlightthickness=2)
-        coordinates.place(x=5, y=330)
+        coordinates.place(x=5, y=120)
         coordinates.pack_propagate(False)
 
-        rpm_label = tk.Label(coordinates, text="Coordinates", font=("Consolas", 10), bg="green", fg="white")
-        rpm_label.pack(pady=1)
+        coordinate_label = tk.Label(coordinates, text="Coordinates", font=("Consolas", 10), bg="green", fg="white")
+        coordinate_label.pack(pady=1)
 
         coordinates_label = tk.Label(coordinates, text=f"X = {self.x}\tY = {self.y}\n\nZ = {self.z}", font=("Consolas", 11), bg=background_color)
         coordinates_label.pack(pady=1)
+
+        switch_info = tk.Label(self.frame_kotak, text='<Space> = Switch Video\n <Enter> = Capture Image', font=("Consolas", 11), bg=background_color)
+        switch_info.place(x=5, y=480)
 
         self.decrease_battery()
 
@@ -389,5 +396,6 @@ if __name__ == '__main__':
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
     
+    # 
 
     
