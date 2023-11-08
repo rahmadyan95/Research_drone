@@ -26,16 +26,25 @@ class main_frame:
         self.__data5 = VideoData()
 
         # self.__fetcher1 = GetVideo(self.__data1, 0)
-        # self.__fetcher2 = GetVideo(self.__data2, "rtsp://192.168.50.116:8554/cam1")
-        # self.__fetcher3 = GetVideo(self.__data3, "rtsp://192.168.50.116:8554/cam2")
+        
+        
+        # self.__fetcher4 = GetVideo(self.__data4, "rtsp://192.168.50.88:8554/cam3")
+        # self.__fetcher5 = GetVideo(self.__data5, "rtsp://192.168.50.88:8554/cam4")
+        
+        # self.__fetcher1 = GetVideo(self.__data1, 0)
+        self.__fetcher1 = GetVideo(self.__data1, "rtsp://192.168.50.116:8554/cam1")
+        self.__fetcher2 = GetVideo(self.__data2, "rtsp://192.168.50.116:8554/cam2")
+        # self.__fetcher3 = GetVideo(self.__data3, 3)
+        self.__fetcher3 = GetVideo(self.__data3, "rtsp://192.168.50.116:8554/cam3")
         # self.__fetcher4 = GetVideo(self.__data4, "rtsp://192.168.50.116:8554/cam3")
+        self.__fetcher4 = GetVideo(self.__data4, "rtsp://192.168.50.116:8554/cam4")
+        self.__fetcher5 = GetVideo(self.__data5, 3)
+
+        # self.__fetcher2 = GetVideo(self.__data2, "rtsp://192.168.50.116:8554/cam1")
+        
         # self.__fetcher5 = GetVideo(self.__data5, "rtsp://192.168.50.116:8554/cam4")
         
-        self.__fetcher1 = GetVideo(self.__data1, 0)
-        self.__fetcher2 = GetVideo(self.__data2, 1)
-        self.__fetcher3 = GetVideo(self.__data3, 2)
-        self.__fetcher4 = GetVideo(self.__data4, 3)
-        self.__fetcher5 = GetVideo(self.__data5, 4)
+        
 
         self.__fetcher1.start_fetch()
         self.__fetcher2.start_fetch()
@@ -67,8 +76,9 @@ class main_frame:
         self.canvas5.place(x=1050, y=50)
         self.canvas5.pack_propagate(False)
         
-        self.switch_button = tk.Button(self.frame_kotak, text="Switch Videos", command=self.switch_videos)
-        self.switch_button.place(x=50 ,y = 500)
+        self.switch_button = tk.Button(self.frame_kotak, text="Capture Video",font=("Consolas",10), 
+                                       height=2, width=38 ,command=self.save_canvas_image)
+        self.switch_button.place(x=8 ,y = 400)
 
         self.root.bind('<space>', self.switch_videos)
         self.root.bind('<Return>', self.save_canvas_image)
@@ -105,6 +115,7 @@ class main_frame:
         # self.main_video_frame()
         # self.feed_camera_frame()
 
+    
 
 
     def switch_videos(self,event=None):
@@ -134,7 +145,8 @@ class main_frame:
 
         image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
 
-        filename = f"Capture at {x.hour}:{x.minute}:{x.second}.png"
+        filename = f'Capture at [{x.hour}.{x.minute}.{x.second}].png'
+        # filename = "Koncimotor.png"
         cv2.imwrite(filename, image)
         print(f"Gambar dari canvas1 tersimpan di {filename}")
         
@@ -323,7 +335,7 @@ class main_frame:
         coordinates_label = tk.Label(coordinates, text=f"X = {self.x}\tY = {self.y}\n\nZ = {self.z}", font=("Consolas", 11), bg=background_color)
         coordinates_label.pack(pady=1)
 
-        switch_info = tk.Label(self.frame_kotak, text='<Space> = Switch Video\n <Enter> = Capture Image', font=("Consolas", 11), bg=background_color)
+        switch_info = tk.Label(self.frame_kotak, text='<Space> = Switch Video\n <Enter> = Capture Image', font=("Consolas", 10), bg=background_color)
         switch_info.place(x=5, y=480)
 
         self.decrease_battery()
@@ -348,8 +360,6 @@ class main_frame:
         self.root.destroy()
 
 if __name__ == '__main__':
-
-    
 
     root = tk.Tk()
     root.title("Video Viewer")
@@ -386,10 +396,6 @@ if __name__ == '__main__':
                               highlightbackground="black", highlightthickness=3)
     frame_kotak.pack_propagate(False)
     frame_kotak.place(x=1125, y=10)
-
-    
-
-    
 
     app = main_frame(root,frame_atas,frame_bawah,frame_kotak)
     
